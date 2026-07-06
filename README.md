@@ -1,2 +1,8 @@
-# rag_ai_financial_analyst
-An AI-powered financial analyst that allows users to upload and query company annual reports using Retrieval-Augmented Generation (RAG). The system performs semantic search to retrieve relevant document passages and generates accurate, context-aware responses grounded in the uploaded reports.
+# About this project
+An AI-powered chatbot that retrieves relevant content from a library of documentation to answer user queries. It's functions are:
+1. xxx
+2. xxx
+3. xxx
+4. xxx
+
+
