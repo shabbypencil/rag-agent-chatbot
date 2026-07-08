@@ -4,5 +4,4 @@ __pycache__/
 *.py[cod]
 *.bin
 *.sqlite3
-data/
 
