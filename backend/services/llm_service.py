@@ -1,16 +1,20 @@
-import os
 from openai import OpenAI
+from backend.core.config import (
+    DEEPSEEK_API_KEY,
+    DEEPSEEK_API_BASE_URL,
+    DEEPSEEK_MODEL,
+)
 
-def get_model_name():
-    return os.getenv("DEEPSEEK_MODEL", "deepseek-v4-flash")
 
 def get_client():
-    api_key = os.getenv("DEEPSEEK_API_KEY") 
-    base_url = os.getenv("DEEPSEEK_API_BASE_URL", "https://api.deepseek.com")
-    if not api_key:
+    if not DEEPSEEK_API_KEY:
         raise RuntimeError("No API key set. Set DEEPSEEK_API_KEY.")
-    
-    return OpenAI(api_key=api_key, base_url=base_url)
+
+    return OpenAI(
+        api_key=DEEPSEEK_API_KEY,
+        base_url=DEEPSEEK_API_BASE_URL,
+    )
+
 
 def build_context(retrieved_sources: list[dict]) -> str:
     if not retrieved_sources:
@@ -25,10 +29,11 @@ def build_context(retrieved_sources: list[dict]) -> str:
         )
     return "\n\n".join(blocks)
 
+
 def generate_answer(query: str, retrieved_sources: list[dict]) -> str:
     if not retrieved_sources:
         return "Could not find relevant information in the indexed documents."
-    
+
     context = build_context(retrieved_sources)
 
     system_prompt = (
@@ -48,10 +53,10 @@ User question:
 """
 
     client = get_client()
-    model_name = get_model_name()
+
     try:
         response = client.chat.completions.create(
-            model=model_name,
+            model=DEEPSEEK_MODEL,
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt},
@@ -60,22 +65,17 @@ User question:
             max_tokens=300,
         )
 
-        # Safely extract the assistant content
         try:
             return response.choices[0].message.content.strip()
         except Exception:
-            # unexpected response shape
             return "The assistant could not produce a valid response."
-    except Exception as e:
-        # API call failed: fallback to simple rule-based answer using context
-        # Keep concise: try to find a sentence from context that mentions the query keywords
+
+    except Exception:
         try:
-            q_words = [w.lower() for w in query.split() if len(w) > 3]
-            context = context.lower()
-            for sent in context.split('\n'):
-                s = sent.lower()
-                if all(w in s for w in q_words[:3]):
-                    return sent.strip()
+            top_source = retrieved_sources[0]
+            return (
+                f"I found relevant information in {top_source['title']}, "
+                f"but the LLM request failed. Top snippet: {top_source['snippet']}"
+            )
         except Exception:
-            pass
-        return "The external LLM request failed; cannot generate an answer right now."
+            return "The external LLM request failed; cannot generate an answer right now."
