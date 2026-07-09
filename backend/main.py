@@ -1,6 +1,11 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from backend.schemas.chat import ChatRequest, ChatResponse
+from backend.schemas.chat import ChatRequest, ChatResponse, SourceItem
+from backend.services.retrieval_service import retrieve
+from backend.services.llm_service import generate_answer
+from dotenv import load_dotenv
+
+load_dotenv()  # Load environment variables from .env file  
 
 app =FastAPI(title="RAG Agent Chatbot")
 
@@ -18,8 +23,11 @@ def health():
 
 @app.post("/chat", response_model=ChatResponse)
 def chat(request: ChatRequest):
+    retrieved = retrieve(request.message, request.top_k)
+    answer = generate_answer(request.message, retrieved)
+
     return ChatResponse(
-        answer = f"Received message: {request.message}",
-        route = "placeholder",
-        sources = []
+        answer = answer,
+        route = "core_rag",
+        sources = [SourceItem(**item) for item in retrieved]
     )

@@ -6,7 +6,7 @@ class SourceItem(BaseModel):
     source_id: str
     title: str
     snippet: str
-    score: float
+    distance: float
 
 
 class ChatRequest(BaseModel):
