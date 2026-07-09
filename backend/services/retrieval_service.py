@@ -1,7 +1,12 @@
 from backend.db.chroma_client import get_or_create_collection
-from backend.core.config import FAQ_COLLECTION, MANDAI_COLLECTION
+from backend.core.config import (
+    FAQ_COLLECTION,
+    MANDAI_COLLECTION,
+    DEFAULT_TOP_K,
+)
 
-def query_collection(collection_name: str, query: str, top_k: int = 4):
+
+def query_collection(collection_name: str, query: str, top_k: int = DEFAULT_TOP_K):
     collection = get_or_create_collection(collection_name)
     results = collection.query(
         query_texts=[query],
@@ -19,11 +24,13 @@ def query_collection(collection_name: str, query: str, top_k: int = 4):
             "source_id": doc_id,
             "title": meta.get("file_name", "unknown"),
             "snippet": doc[:300],
-            "distance": float(dist)
+            "distance": float(dist),
         })
+
     return items
 
-def retrieve(query: str, top_k: int = 4):
+
+def retrieve(query: str, top_k: int = DEFAULT_TOP_K):
     faq_results = query_collection(FAQ_COLLECTION, query, top_k)
     mandai_results = query_collection(MANDAI_COLLECTION, query, top_k)
 
