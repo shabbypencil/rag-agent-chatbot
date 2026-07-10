@@ -1,6 +1,6 @@
 # rag-agent-chatbot
 
-A simple AI agent chatbot built with FastAPI and Streamlit that uses retrieval-augmented generation (RAG) to answer user questions from multiple knowledge sources.
+An AI agent chatbot built with FastAPI and Streamlit that uses retrieval-augmented generation (RAG) to answer user questions from multiple knowledge sources.
 
 ## Features
 
@@ -131,21 +131,6 @@ The chatbot currently supports these internal routes:
 - `uploaded_file` - questions explicitly referring to a user-uploaded document.
 - `verify_web` - latest, current, official, or externally verified information.
 
-## Uploading files
-
-Users can upload `.txt` files through the frontend.
-
-Uploaded files are:
-- stored locally in `data/uploads/`
-- chunked and indexed into `uploads_collection`
-- retrievable when the user asks a question that explicitly refers to the uploaded document
-
-Example prompts:
-
-- `Based on my uploaded file, tell me some animal facts.`
-- `What animals are mentioned in the file I uploaded?`
-- `Summarize the uploaded document.`
-
 ## Example test queries
 
 ### FAQ
@@ -171,9 +156,18 @@ Example prompts:
 - `Verify the current opening hours.`
 
 ### Uploaded file
-You may upload the files inside data/upload_test via the frontend and then ask the following queries:
+You may upload the files inside data/upload_test via the frontend to test this functionality
+
+Uploaded files are:
+- stored locally in `data/uploads/`
+- chunked and indexed into `uploads_collection`
+- retrievable when the user asks a question that explicitly refers to the uploaded document
+
+Example prompts:
 - `Based on my uploaded file, tell me some animal facts.`
 - `According to my uploaded file, which animal can regenerate limbs?`
+- `What animals are mentioned in the file I uploaded?`
+- `Summarize the uploaded document.`
 
 ## Routing test script
 
