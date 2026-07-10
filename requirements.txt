@@ -8,3 +8,4 @@ chromadb
 sentence-transformers
 python-multipart
 openai
+tavily-python

@@ -7,7 +7,9 @@ class SourceItem(BaseModel):
     source_id: str
     title: str
     snippet: str
-    distance: float
+    distance: float | None = None
+    url: str | None = None
+    source_type: str | None = None
 
 
 class ChatRequest(BaseModel):

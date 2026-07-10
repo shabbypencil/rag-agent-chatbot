@@ -4,8 +4,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from backend.schemas.chat import ChatRequest, ChatResponse, SourceItem
 # from backend.services.retrieval_service import retrieve
 from backend.core.config import ALLOWED_ORIGINS, DEFAULT_TOP_K
-from backend.services.llm_service import generate_answer
+from backend.services.llm_service import generate_answer, generate_web_verified_answer
 from backend.services.router_service import route_query, debug_route_query
+from backend.services.verification_service import search_web_tavily, filter_web_results
 from backend.services.retrieval_service import (
     retrieve_faq,
     retrieve_mandai,
@@ -37,12 +38,20 @@ def chat(request: ChatRequest):
 
     if route == "faq":
         retrieved = retrieve_faq(request.message, top_k)
+        answer = generate_answer(request.message, retrieved)
+
     elif route == "mandai":
         retrieved = retrieve_mandai(request.message, top_k)
+        answer = generate_answer(request.message, retrieved)
+
+    elif route == "verify_web":
+        retrieved = search_web_tavily(request.message)
+        retrieved = filter_web_results(retrieved)
+        answer = generate_web_verified_answer(request.message, retrieved)
+
     else:
         retrieved = retrieve_hybrid(request.message, top_k)
-
-    answer = generate_answer(request.message, retrieved)
+        answer = generate_answer(request.message, retrieved)
 
     return ChatResponse(
         answer=answer,

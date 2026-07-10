@@ -85,3 +85,8 @@ The routing design is intentionally conservative:
 - explicit web-verification intent is detected early
 - ambiguous or close-score cases are resolved by a lightweight LLM classifier
 - the final route remains a simple string so `/chat` and retrieval logic do not need to change dramatically
+
+
+## Future Improvements
+1. Enhancement of web verification capabilities
+- For queries like "Give me 5 fun facts about white tigers" (database only has 3), if there is insufficient coverage then trigger a web search to supplement the answer given to the user.

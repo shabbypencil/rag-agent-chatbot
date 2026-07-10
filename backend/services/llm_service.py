@@ -129,3 +129,51 @@ User question:
             )
         except Exception:
             return "The external LLM request failed; cannot generate an answer right now."
+        
+def generate_web_verified_answer(query: str, web_sources: list[dict]) -> str:
+    if not web_sources:
+        return "I could not find enough reliable web information to verify this."
+
+    context = build_context(web_sources)
+    print(context[:3000])
+
+    system_prompt = (
+        "You are a careful assistant performing external web verification. "
+        "Use only the provided web evidence. "
+        "Answer the user's question clearly and directly. "
+        "If the evidence is insufficient, say that clearly. "
+        "Do not invent facts beyond the provided web evidence."
+    )
+
+    user_prompt = f"""
+Web evidence:
+{context}
+
+User question:
+{query}
+"""
+
+    client = get_client()
+
+    try:
+        response = client.chat.completions.create(
+            model=DEEPSEEK_MODEL,
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt},
+            ],
+            temperature=0.2,
+            max_tokens=700,
+        )
+
+        return response.choices[0].message.content.strip()
+
+    except Exception:
+        try:
+            top_source = web_sources[0]
+            return (
+                f"I found web information in {top_source['title']}, "
+                f"but the verification summary failed. Top snippet: {top_source['snippet']}"
+            )
+        except Exception:
+            return "The external web verification request failed."
