@@ -1,4 +1,9 @@
-def chunk_text(text: str, chunk_size: int = 500, overlap: int = 50):
+from backend.core.config import (
+    INGESTION_CHUNK_SIZE,
+    INGESTION_OVERLAP
+)
+
+def chunk_text(text: str, chunk_size: int = INGESTION_CHUNK_SIZE, overlap: int = INGESTION_OVERLAP):
     text = text.strip()
     print(f"[chunk_text] Received text of length: {len(text)}")
     print(f"[chunk_text] chunk_size={chunk_size}, overlap={overlap}")

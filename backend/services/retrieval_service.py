@@ -24,15 +24,33 @@ def query_collection(collection_name: str, query: str, top_k: int = DEFAULT_TOP_
             "source_id": doc_id,
             "title": meta.get("file_name", "unknown"),
             "snippet": doc[:300],
+            "full_text": doc,
             "distance": float(dist),
         })
 
     return items
 
 
-def retrieve(query: str, top_k: int = DEFAULT_TOP_K):
-    faq_results = query_collection(FAQ_COLLECTION, query, top_k)
-    mandai_results = query_collection(MANDAI_COLLECTION, query, top_k)
+# def retrieve(query: str, top_k: int = DEFAULT_TOP_K):
+#     faq_results = query_collection(FAQ_COLLECTION, query, top_k)
+#     mandai_results = query_collection(MANDAI_COLLECTION, query, top_k)
+
+#     combined_results = faq_results + mandai_results
+#     combined_results.sort(key=lambda x: x["distance"])
+
+#     return combined_results[:top_k]
+
+def retrieve_faq(query: str, top_k: int = DEFAULT_TOP_K):
+    return query_collection(FAQ_COLLECTION, query, top_k)
+
+
+def retrieve_mandai(query: str, top_k: int = DEFAULT_TOP_K):
+    return query_collection(MANDAI_COLLECTION, query, top_k)
+
+
+def retrieve_hybrid(query: str, top_k: int = DEFAULT_TOP_K):
+    faq_results = retrieve_faq(query, top_k)
+    mandai_results = retrieve_mandai(query, top_k)
 
     combined_results = faq_results + mandai_results
     combined_results.sort(key=lambda x: x["distance"])

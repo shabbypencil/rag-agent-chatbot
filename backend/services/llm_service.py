@@ -22,10 +22,11 @@ def build_context(retrieved_sources: list[dict]) -> str:
 
     blocks = []
     for i, item in enumerate(retrieved_sources, start=1):
+        content = item.get("full_text") or item.get("snippet") or ""
         blocks.append(
             f"[Document {i}]\n"
-            f"Source: {item['title']}\n"
-            f"Content: {item['snippet']}"
+            f"Source: {item.get('title', 'Unknown source')}\n"
+            f"Content:\n{content}"
         )
     return "\n\n".join(blocks)
 
@@ -35,6 +36,7 @@ def generate_answer(query: str, retrieved_sources: list[dict]) -> str:
         return "Could not find relevant information in the indexed documents."
 
     context = build_context(retrieved_sources)
+    print(context[:3000])
 
     system_prompt = (
         "You are a helpful assistant for Mandai Wildlife Reserve. "
@@ -62,7 +64,7 @@ User question:
                 {"role": "user", "content": user_prompt},
             ],
             temperature=0.2,
-            max_tokens=300,
+            max_tokens=700,
         )
 
         try:

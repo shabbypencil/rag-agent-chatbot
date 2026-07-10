@@ -1,29 +1,26 @@
 import streamlit as st
 import requests
 
-API_BASE = "http://127.0.0.1:8000"
-
 st.title("RAG Agent Chatbot")
 
-user_input = st.text_input("Enter your message:")
+with st.form("chat_form", clear_on_submit=True):
+    query = st.text_input("Enter your message:")
+    send = st.form_submit_button("Send")
 
-if st.button("Send") and user_input.strip():
-    payload = {
-        "message": user_input,
-        # "session_id": None,
-        "top_k": 4
-    }
+if send and query.strip():
+    payload = {"message": query}
+    response = requests.post("http://localhost:8000/chat", json=payload)
 
-    response = requests.post(f"{API_BASE}/chat", json=payload, timeout = 60)
-    data = response.json()
+    if response.ok:
+        data = response.json()
+        st.subheader("Answer")
+        st.write(data["answer"])
 
-    st.subheader("Answer")
-    st.write(data["answer"])
+        st.subheader("Route")
+        st.write(data["route"])
 
-    st.subheader("Route")
-    st.write(data["route"])
-
-    if data.get("sources"):
         st.subheader("Sources")
-        for source in data["sources"]:
-            st.write(source)
+        for src in data["sources"]:
+            st.json(src)
+    else:
+        st.error("Failed to get response from backend.")
