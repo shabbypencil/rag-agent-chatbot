@@ -1,3 +1,4 @@
+import json
 from openai import OpenAI
 from backend.core.config import (
     DEEPSEEK_API_KEY,
@@ -5,6 +6,19 @@ from backend.core.config import (
     DEEPSEEK_MODEL,
 )
 
+VALID_ROUTES = {"faq", "mandai", "hybrid", "verify_web"}
+
+CLASSIFY_SYSTEM_PROMPT = """You are a routing classifier for a RAG chatbot.
+
+Your job is to classify the user's query into exactly one route:
+- faq: general visitor questions like tickets, hours, access, facilities, policies
+- mandai: questions about animals, shows, park attractions, species facts, or park-specific content
+- hybrid: questions requiring multiple internal sources
+- verify_web: questions asking for latest information, official confirmation, or external validation
+
+Return only valid JSON:
+{"route": "<faq|mandai|hybrid|verify_web>", "reason": "<short reason>"}
+"""
 
 def get_client():
     if not DEEPSEEK_API_KEY:
@@ -29,6 +43,40 @@ def build_context(retrieved_sources: list[dict]) -> str:
             f"Content:\n{content}"
         )
     return "\n\n".join(blocks)
+
+
+def classify_route(query: str) -> dict:
+    """
+    Use the LLM to classify an ambiguous or uncertain query into a route.
+    """
+    client = get_client()
+
+    user_prompt = f"User query: {query}"
+
+    try:
+        response = client.chat.completions.create(
+            model=DEEPSEEK_MODEL,
+            messages=[
+                {"role": "system", "content": CLASSIFY_SYSTEM_PROMPT},
+                {"role": "user", "content": user_prompt},
+            ],
+            temperature=0.1,
+            max_tokens=200
+        )
+
+        raw_text = response.choices[0].message.content.strip()
+        print("CLASSIFIER RAW OUTPUT:", raw_text)
+        parsed = json.loads(raw_text)
+
+        route = parsed.get("route")
+        reason = parsed.get("reason", "No reason provided").strip()
+
+        if route not in VALID_ROUTES:
+            raise ValueError(f"Invalid route: {route!r}")
+
+        return {"route": route, "reason": reason}
+    except Exception:
+        return {"route": "hybrid", "reason": "LLM output invalid, defaulted to hybrid"}
 
 
 def generate_answer(query: str, retrieved_sources: list[dict]) -> str:

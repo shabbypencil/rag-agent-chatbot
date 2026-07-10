@@ -31,11 +31,9 @@ def health():
 
 @app.post("/chat", response_model=ChatResponse)
 def chat(request: ChatRequest):
-    # print("DEBUG DEFAULT_TOP_K =", DEFAULT_TOP_K)
     top_k = DEFAULT_TOP_K
-    # print("DEBUG effective top_k =", top_k)
-    # print("DEBUG ROUTER:", debug_route_query(request.message))
-    route = route_query(request.message)
+    route_info = route_query(request.message)
+    route = route_info["final_route"]
 
     if route == "faq":
         retrieved = retrieve_faq(request.message, top_k)

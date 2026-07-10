@@ -23,3 +23,7 @@ streamlit run frontend/app.py
 
 Open the app in your browser:
 http://localhost:8501
+
+## Routing test script
+From project root: 
+python -m backend.services.router_service

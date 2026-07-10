@@ -1,3 +1,26 @@
+import logging
+from backend.services.llm_service import classify_route
+
+logger = logging.getLogger(__name__)
+
+VERIFY_WEB_KEYWORDS = {
+    "latest",
+    "current",
+    "official",
+    "confirmation",
+    "confirm",
+    "verified",
+    "verify",
+    "external",
+    "updated",
+    "update",
+    "live",
+    "breaking",
+    "news",
+}
+
+RULE_BASED_CONFIDENCE_THRESHOLD = 0.6
+
 FAQ_PHRASES = {
     "annual pass": 3,
     "e-ticket": 3,
@@ -186,6 +209,14 @@ AMBIGUOUS_TERMS = {
 }
 
 
+def _normalize_query(query: str) -> str:
+    return query.lower().strip()
+
+
+def _tokenize(query: str) -> list[str]:
+    return query.replace("?", " ").replace(",", " ").replace(".", " ").split()
+
+
 def _score_text(query: str, phrases: dict[str, int], keywords: dict[str, int]) -> int:
     q = query.lower()
     score = 0
@@ -194,49 +225,169 @@ def _score_text(query: str, phrases: dict[str, int], keywords: dict[str, int]) -
         if phrase in q:
             score += weight
 
-    tokens = q.replace("?", " ").replace(",", " ").replace(".", " ").split()
-    for token in tokens:
+    for token in _tokenize(q):
         if token in keywords:
             score += keywords[token]
 
     return score
 
 
-def route_query(query: str) -> str:
-    q = query.lower().strip()
-
+def rule_based_route(query: str) -> dict:
+    """
+    Return the rule-based route decision and confidence.
+    """
+    q = _normalize_query(query)
     faq_score = _score_text(q, FAQ_PHRASES, FAQ_KEYWORDS)
     mandai_score = _score_text(q, MANDAI_PHRASES, MANDAI_KEYWORDS)
+    tokens = set(_tokenize(q))
 
-    tokens = set(q.replace("?", " ").replace(",", " ").replace(".", " ").split())
+    if any(keyword in q for keyword in VERIFY_WEB_KEYWORDS):
+        return {
+            "route": "verify_web",
+            "confidence": 0.95,
+            "reason": "Query explicitly asks for latest or external confirmation",
+            "faq_score": faq_score,
+            "mandai_score": mandai_score,
+        }
+
     if tokens and tokens.issubset(AMBIGUOUS_TERMS):
-        return "hybrid"
+        return {
+            "route": "hybrid",
+            "confidence": 0.25,
+            "reason": "Query is generic and ambiguous",
+            "faq_score": faq_score,
+            "mandai_score": mandai_score,
+        }
 
     if faq_score == 0 and mandai_score == 0:
-        return "hybrid"
+        return {
+            "route": "hybrid",
+            "confidence": 0.20,
+            "reason": "No strong FAQ or Mandai signals",
+            "faq_score": faq_score,
+            "mandai_score": mandai_score,
+        }
 
     if faq_score > 0 and mandai_score > 0:
         if abs(faq_score - mandai_score) <= 2:
-            return "hybrid"
+            return {
+                "route": "hybrid",
+                "confidence": 0.35,
+                "reason": "Both FAQ and Mandai signals are present",
+                "faq_score": faq_score,
+                "mandai_score": mandai_score,
+            }
 
     if faq_score > mandai_score:
-        return "faq"
+        confidence = min(1.0, faq_score / max(1, faq_score + mandai_score))
+        return {
+            "route": "faq",
+            "confidence": max(confidence, 0.5),
+            "reason": "FAQ signals dominate the query",
+            "faq_score": faq_score,
+            "mandai_score": mandai_score,
+        }
 
     if mandai_score > faq_score:
-        return "mandai"
+        confidence = min(1.0, mandai_score / max(1, faq_score + mandai_score))
+        return {
+            "route": "mandai",
+            "confidence": max(confidence, 0.5),
+            "reason": "Mandai signals dominate the query",
+            "faq_score": faq_score,
+            "mandai_score": mandai_score,
+        }
 
-    return "hybrid"
+    return {
+        "route": "hybrid",
+        "confidence": 0.30,
+        "reason": "Defaulted to hybrid due to unclear routing",
+        "faq_score": faq_score,
+        "mandai_score": mandai_score,
+    }
 
 
-def debug_route_query(query: str) -> dict:
-    q = query.lower().strip()
-    faq_score = _score_text(q, FAQ_PHRASES, FAQ_KEYWORDS)
-    mandai_score = _score_text(q, MANDAI_PHRASES, MANDAI_KEYWORDS)
-    route = route_query(query)
+def route_query(query: str) -> dict:
+    """
+    Return routing metadata for a query.
+    This runs rule-based routing first and only calls the LLM fallback once if needed.
+    """
+    rule_result = rule_based_route(query)
+    route = rule_result["route"]
+    confidence = rule_result["confidence"]
+
+    if route == "verify_web":
+        return {
+            "query": query,
+            "rule_result": rule_result,
+            "final_route": "verify_web",
+            "routing_method": "rule_based",
+            "llm_result": None,
+        }
+
+    if route != "hybrid" and confidence >= RULE_BASED_CONFIDENCE_THRESHOLD:
+        logger.debug("Rule-based routing selected %s with confidence %.2f", route, confidence)
+        return {
+            "query": query,
+            "rule_result": rule_result,
+            "final_route": route,
+            "routing_method": "rule_based",
+            "llm_result": None,
+        }
+
+    llm_result = classify_route(query)
+    final_route = llm_result.get("route", "hybrid")
+    if final_route not in {"faq", "mandai", "hybrid", "verify_web"}:
+        logger.warning("Invalid LLM route %r, defaulting to hybrid", final_route)
+        final_route = "hybrid"
+
+    logger.debug(
+        "LLM fallback used. rule=%s confidence=%.2f llm=%s",
+        route,
+        confidence,
+        final_route,
+    )
 
     return {
         "query": query,
-        "faq_score": faq_score,
-        "mandai_score": mandai_score,
-        "route": route,
+        "rule_result": rule_result,
+        "final_route": final_route,
+        "routing_method": "llm_fallback",
+        "llm_result": llm_result,
     }
+
+
+def debug_route_query(query: str) -> dict:
+    """
+    Return enriched routing diagnostics without recomputing the LLM fallback.
+    """
+    route_info = route_query(query)
+
+    debug_result = {
+        "query": query,
+        "rule_result": route_info["rule_result"],
+        "final_route": route_info["final_route"],
+        "routing_method": route_info["routing_method"],
+    }
+
+    if route_info["llm_result"] is not None:
+        debug_result["llm_result"] = route_info["llm_result"]
+
+    return debug_result
+
+# Runs a simple test of the routing logic with example queries.
+if __name__ == "__main__":
+    examples = [
+        "What are the opening hours?",
+        "Tell me about the white tiger",
+        "Can I see white tigers and do I need to book anything?",
+        "What are the latest official opening arrangements?",
+        "What shows are at Bird Paradise?",
+        "Are lockers available?",
+        "What can I do at Mandai if I like animals and short presentations?",
+    ]
+
+    for example in examples:
+        print("QUERY:", example)
+        print("DEBUG:", debug_route_query(example))
+        print("-" * 80)
