@@ -20,7 +20,7 @@ from backend.services.retrieval_service import (
     retrieve_uploaded,
 )
 
-app = FastAPI(title="RAG Agent Chatbot")
+app = FastAPI(title="RAG Agent Chatbot for Mandai Wildlife Group", version="1.0.0")
 
 
 app.add_middleware(
