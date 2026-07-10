@@ -3,6 +3,29 @@ from backend.services.llm_service import classify_route
 
 logger = logging.getLogger(__name__)
 
+UPLOAD_KEYWORDS = {
+    "upload",
+    "file",
+    "document",
+    "notes",
+    "my file",
+    "my document",
+    "my upload",
+    "this document",
+    "this file",
+    "the file",
+    "the document",
+    "my notes",
+    "my document",
+    "uploaded file",
+    "uploaded document",
+    "uploaded notes",
+    "i uploaded",
+    "based on the file i uploaded",
+    "based on my uploaded file",
+    "this uploaded file",
+}
+
 VERIFY_WEB_KEYWORDS = {
     "latest",
     "current",
@@ -246,6 +269,15 @@ def rule_based_route(query: str) -> dict:
             "route": "verify_web",
             "confidence": 0.95,
             "reason": "Query explicitly asks for latest or external confirmation",
+            "faq_score": faq_score,
+            "mandai_score": mandai_score,
+        }
+    
+    if any(phrase in q for phrase in UPLOAD_KEYWORDS):
+        return {
+            "route": "uploaded_file",
+            "confidence": 0.95,
+            "reason": "Query explicitly refers to an uploaded document",
             "faq_score": faq_score,
             "mandai_score": mandai_score,
         }

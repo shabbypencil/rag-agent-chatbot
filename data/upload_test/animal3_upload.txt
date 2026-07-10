@@ -1,0 +1,26 @@
+Animal Upload Test Set 3
+
+1) Saiga Antelope
+- Fact 1: Saiga antelopes are steppe-dwelling mammals recognized by their large, flexible noses.
+- Fact 2: Their unusual noses help filter dust in summer and warm cold air in winter.
+- Fact 3: Saigas migrate long distances across grasslands in search of food and suitable breeding areas.
+
+2) Leafy Seadragon
+- Fact 1: Leafy seadragons are marine fish related to seahorses and are found off southern Australia.
+- Fact 2: Their leaf-like appendages help them blend in with seaweed and kelp.
+- Fact 3: Males carry fertilized eggs on the underside of their tails until they hatch.
+
+3) Aye-aye
+- Fact 1: Aye-ayes are nocturnal lemurs from Madagascar with large ears and ever-growing incisors.
+- Fact 2: They tap on wood to locate insect larvae hidden inside trees.
+- Fact 3: Their long middle fingers are specially adapted for extracting food from small holes.
+
+4) Dhole
+- Fact 1: Dholes are wild canids from Asia that live and hunt in coordinated packs.
+- Fact 2: They communicate with whistles, screams, and other vocal sounds.
+- Fact 3: Habitat loss and declining prey populations have reduced dhole numbers in the wild.
+
+5) Tamandua
+- Fact 1: Tamanduas are medium-sized anteaters found in Central and South America.
+- Fact 2: They use strong claws to tear open ant and termite nests.
+- Fact 3: Tamanduas are good climbers and often spend time in trees as well as on the ground.

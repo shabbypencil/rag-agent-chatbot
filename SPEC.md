@@ -90,3 +90,6 @@ The routing design is intentionally conservative:
 ## Future Improvements
 1. Enhancement of web verification capabilities
 - For queries like "Give me 5 fun facts about white tigers" (database only has 3), if there is insufficient coverage then trigger a web search to supplement the answer given to the user.
+
+2. Allowing the chatbot to receive different file types
+- Allow uploading of PDFs, Word Docs, PPTs, etc

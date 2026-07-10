@@ -2,6 +2,7 @@ from backend.db.chroma_client import get_or_create_collection
 from backend.core.config import (
     FAQ_COLLECTION,
     MANDAI_COLLECTION,
+    UPLOADS_COLLECTION,
     DEFAULT_TOP_K,
 )
 
@@ -56,3 +57,6 @@ def retrieve_hybrid(query: str, top_k: int = DEFAULT_TOP_K):
     combined_results.sort(key=lambda x: x["distance"])
 
     return combined_results[:top_k]
+
+def retrieve_uploaded(query: str, top_k: int = DEFAULT_TOP_K):
+    return query_collection(UPLOADS_COLLECTION, query, top_k)

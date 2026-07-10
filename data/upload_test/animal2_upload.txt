@@ -1,0 +1,26 @@
+Animal Upload Test Set 2
+
+1) Snow Leopard
+- Fact 1: Snow leopards live in high mountain regions across Central and South Asia.
+- Fact 2: Their thick fur, wide paws, and long tails help them survive in cold, rocky terrain.
+- Fact 3: They are powerful climbers and can leap several times their body length.
+
+2) Quokka
+- Fact 1: Quokkas are small marsupials found mainly on islands off the coast of Western Australia.
+- Fact 2: They are herbivores that feed on grasses, leaves, and stems.
+- Fact 3: Quokkas can survive dry conditions by getting much of their water from the plants they eat.
+
+3) Shoebill
+- Fact 1: Shoebills are large wetland birds known for their massive shoe-shaped bills.
+- Fact 2: They often stand very still while hunting fish, frogs, and lungfish.
+- Fact 3: Their broad wings allow them to soar efficiently over marshy habitats.
+
+4) Narwhal
+- Fact 1: Narwhals are Arctic whales best known for the long tusk that develops from an elongated tooth in many males.
+- Fact 2: They dive deep beneath sea ice to hunt fish, squid, and shrimp.
+- Fact 3: Narwhals rely on sound to navigate and communicate in dark Arctic waters.
+
+5) Sloth Bear
+- Fact 1: Sloth bears are native to the Indian subcontinent and have shaggy fur and long curved claws.
+- Fact 2: They use their lips and tongues to suck up termites and ants from nests.
+- Fact 3: Unlike many other bears, they often carry their cubs on their backs.

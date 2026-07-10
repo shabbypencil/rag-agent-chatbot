@@ -6,7 +6,7 @@ from backend.core.config import (
     DEEPSEEK_MODEL,
 )
 
-VALID_ROUTES = {"faq", "mandai", "hybrid", "verify_web"}
+VALID_ROUTES = {"faq", "mandai", "hybrid", "verify_web", "uploaded_file"}
 
 CLASSIFY_SYSTEM_PROMPT = """You are a routing classifier for a RAG chatbot.
 
@@ -15,6 +15,7 @@ Your job is to classify the user's query into exactly one route:
 - mandai: questions about animals, shows, park attractions, species facts, or park-specific content
 - hybrid: questions requiring multiple internal sources
 - verify_web: questions asking for latest information, official confirmation, or external validation
+- uploaded_file: questions asking about a file or document the user uploaded
 
 Return only valid JSON:
 {"route": "<faq|mandai|hybrid|verify_web>", "reason": "<short reason>"}

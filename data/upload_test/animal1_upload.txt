@@ -1,0 +1,26 @@
+Animal Upload Test Set 1
+
+1) Red Panda
+- Fact 1: Red pandas are small arboreal mammals native to the eastern Himalayas and southwestern China.
+- Fact 2: They use their long, bushy tails for balance and for warmth in cold mountain habitats.
+- Fact 3: Their diet includes bamboo, fruits, eggs, and insects, making them more omnivorous than giant pandas.
+
+2) Axolotl
+- Fact 1: Axolotls are amphibians that retain larval features throughout adulthood, including external gills.
+- Fact 2: They are famous for their ability to regenerate limbs, parts of the spinal cord, and other tissues.
+- Fact 3: Wild axolotls are critically endangered because of habitat loss and water pollution.
+
+3) Fennec Fox
+- Fact 1: Fennec foxes are the smallest fox species and are native to the deserts of North Africa.
+- Fact 2: Their oversized ears help release body heat and also allow them to detect prey underground.
+- Fact 3: They are mostly nocturnal, which helps them avoid extreme daytime temperatures.
+
+4) Okapi
+- Fact 1: Okapis are forest mammals from the Democratic Republic of the Congo and are close relatives of giraffes.
+- Fact 2: Their striped hindquarters help camouflage them in dappled forest light.
+- Fact 3: Okapis use long, flexible tongues to strip leaves from branches and clean their eyes and ears.
+
+5) Pangolin
+- Fact 1: Pangolins are mammals covered in keratin scales that curl into a tight ball when threatened.
+- Fact 2: They feed mainly on ants and termites using long, sticky tongues.
+- Fact 3: Pangolins are among the most heavily trafficked mammals in the world.

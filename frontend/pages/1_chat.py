@@ -5,6 +5,21 @@ BACKEND_URL = "http://localhost:8000/chat"
 
 st.title("RAG Agent Chatbot")
 
+uploaded_file = st.file_uploader("Upload a .txt file", type=["txt"])
+
+if uploaded_file is not None:
+    if st.button("Upload file"):
+        files = {
+            "file": (uploaded_file.name, uploaded_file.getvalue(), uploaded_file.type or "text/plain")
+        }
+        response = requests.post("http://localhost:8000/upload", files=files)
+
+        if response.ok:
+            st.success("File uploaded and indexed successfully.")
+            st.json(response.json())
+        else:
+            st.error(f"Upload failed: {response.text}")
+
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
