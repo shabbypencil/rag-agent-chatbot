@@ -1,3 +1,4 @@
+import chromadb
 from backend.db.chroma_client import get_or_create_collection
 from backend.core.config import (
     FAQ_COLLECTION,
@@ -9,10 +10,19 @@ from backend.core.config import (
 
 def query_collection(collection_name: str, query: str, top_k: int = DEFAULT_TOP_K):
     collection = get_or_create_collection(collection_name)
-    results = collection.query(
-        query_texts=[query],
-        n_results=top_k,
-    )
+    try:
+        results = collection.query(
+            query_texts=[query],
+            n_results=top_k,
+        )
+    except chromadb.errors.InternalError as exc:
+        raise RuntimeError(
+            f"Chroma vector store query failed for collection '{collection_name}': {exc}"
+        ) from exc
+    except Exception as exc:
+        raise RuntimeError(
+            f"Vector store query failed for collection '{collection_name}': {exc}"
+        ) from exc
 
     items = []
     docs = results.get("documents", [[]])[0]

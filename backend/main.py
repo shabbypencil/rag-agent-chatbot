@@ -1,5 +1,7 @@
-from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi import FastAPI, UploadFile, File, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+import chromadb
 
 from backend.schemas.chat import ChatRequest, ChatResponse, SourceItem
 # from backend.services.retrieval_service import retrieve
@@ -71,6 +73,23 @@ def chat(request: ChatRequest):
         answer=answer,
         route=route,
         sources=[SourceItem(**item) for item in retrieved]
+    )
+
+
+@app.exception_handler(chromadb.errors.InternalError)
+async def chroma_internal_error_handler(request: Request, exc: chromadb.errors.InternalError):
+    return JSONResponse(
+        status_code=500,
+        content={
+            "detail": "Vector store internal error. Please re-index and restart the backend.",
+        },
+    )
+
+@app.exception_handler(Exception)
+async def generic_exception_handler(request: Request, exc: Exception):
+    return JSONResponse(
+        status_code=500,
+        content={"detail": str(exc)},
     )
 
 @app.post("/upload")

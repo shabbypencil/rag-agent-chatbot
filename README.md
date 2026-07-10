@@ -148,12 +148,11 @@ The chatbot currently supports these internal routes:
 ### Hybrid
 
 - `Can I see white tigers and do I need to book anything?`
-- `What shows are at Bird Paradise and are there seats available?`
 
 ### Web verification
 
-- `What are the latest official opening arrangements?`
-- `Verify the current opening hours.`
+- `What are the latest news of animal births at Mandai Wildlife Reserve?`
+- `Verify the current opening hours of Mandai Wildlife Reserve.`
 
 ### Uploaded file
 You may upload the files inside data/upload_test via the frontend to test this functionality
